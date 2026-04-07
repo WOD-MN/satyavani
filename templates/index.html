@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+{% block title %}सत्यवाणी — Home | Anonymous Corruption Reporting{% endblock %}
+{% block content %}
+
+<!-- ── Hero Section ──────────────────────────────────────────────────────────── -->
+<section class="hero" aria-label="Hero">
+  <div class="hero-inner">
+    <div class="hero-emblem" aria-hidden="true">
+      <div class="emblem-outer">
+        <div class="emblem-trishul">&#120082;</div>
+        <div class="emblem-lotus">🪷</div>
+        <div class="emblem-eye">👁</div>
+      </div>
+    </div>
+    <div class="hero-text">
+      <p class="hero-sanskrit">यत्र नार्यस्तु पूज्यन्ते रमन्ते तत्र देवताः</p>
+      <h1 class="hero-title">
+        <span class="hero-title-np">सत्यवाणी</span>
+        <span class="hero-title-en">The Voice of Truth</span>
+      </h1>
+      <p class="hero-tagline">
+        Expose corruption. Stay anonymous.<br>
+        Guided by the Dharma of Yama, protected by the Trishul of Shiva.
+      </p>
+      <div class="hero-actions">
+        <a href="{{ url_for('submit') }}" class="btn btn-primary btn-lg">
+          <span>🔏</span> Submit Anonymously
+        </a>
+        <a href="{{ url_for('track') }}" class="btn btn-outline btn-lg">
+          <span>🔍</span> Track Report
+        </a>
+      </div>
+      <div class="hero-promise">
+        <span class="promise-item">🔒 No IP Stored</span>
+        <span class="divider">·</span>
+        <span class="promise-item">🕵️ No Registration</span>
+        <span class="divider">·</span>
+        <span class="promise-item">🗑️ Metadata Stripped</span>
+        <span class="divider">·</span>
+        <span class="promise-item">🌐 Tor Ready</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-scroll-hint" aria-hidden="true">
+    <span>Scroll ↓</span>
+  </div>
+</section>
+
+{% if announcement %}
+<div class="announcement-banner" role="alert">
+  <span class="ann-icon">📢</span>
+  <span>{{ announcement }}</span>
+</div>
+{% endif %}
+
+<!-- ── Stats Section ──────────────────────────────────────────────────────────── -->
+<section class="stats-section" aria-label="Platform statistics">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-card" data-aos="fade-up">
+        <div class="stat-icon">📋</div>
+        <div class="stat-number counter" data-target="{{ stats.total }}">0</div>
+        <div class="stat-label">Total Reports</div>
+        <div class="stat-np">कुल प्रतिवेदन</div>
+      </div>
+      <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="stat-icon">✅</div>
+        <div class="stat-number counter" data-target="{{ stats.verified }}">0</div>
+        <div class="stat-label">Verified</div>
+        <div class="stat-np">प्रमाणित</div>
+      </div>
+      <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+        <div class="stat-icon">📢</div>
+        <div class="stat-number counter" data-target="{{ stats.published }}">0</div>
+        <div class="stat-label">Published</div>
+        <div class="stat-np">प्रकाशित</div>
+      </div>
+      <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+        <div class="stat-icon">🗂️</div>
+        <div class="stat-number counter" data-target="{{ stats.categories }}">0</div>
+        <div class="stat-label">Categories</div>
+        <div class="stat-np">श्रेणीहरू</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Mythology Pillars ───────────────────────────────────────────────────────── -->
+<section class="pillars-section" aria-label="Guiding principles">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Guided by Ancient Dharma</h2>
+      <p class="section-sub">The divine forces of justice that have guided Nepal for millennia</p>
+    </div>
+    <div class="pillars-grid">
+      <div class="pillar-card">
+        <div class="pillar-deity">⚖️</div>
+        <h3 class="pillar-name">यम — Yama</h3>
+        <p class="pillar-role">God of Justice & Truth</p>
+        <p class="pillar-desc">Yama, the Dharmaraj, sees every act of corruption and ensures cosmic accountability. No corrupt deed escapes his divine record — the Chitragupta of karma.</p>
+        <div class="pillar-mantra">धर्मराज प्रसीद</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-deity">🔱</div>
+        <h3 class="pillar-name">शिव — Shiva</h3>
+        <p class="pillar-role">The Destroyer of Evil</p>
+        <p class="pillar-desc">Shiva's third eye burns away illusion and deceit. His Trishul pierces corruption at its root. SatyaVani carries the spirit of Netra — the eye that sees all.</p>
+        <div class="pillar-mantra">ॐ नमः शिवाय</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-deity">🦅</div>
+        <h3 class="pillar-name">गरुड — Garuda</h3>
+        <p class="pillar-role">Messenger of Truth</p>
+        <p class="pillar-desc">Garuda, Vishnu's mighty eagle, carries truth with swiftness and courage. The whistleblower is Garuda — fearless, fast, and the enemy of the serpents of corruption.</p>
+        <div class="pillar-mantra">गरुड महाराज</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-deity">🪷</div>
+        <h3 class="pillar-name">सरस्वती — Saraswati</h3>
+        <p class="pillar-role">Goddess of Knowledge</p>
+        <p class="pillar-desc">Saraswati blesses all seekers of truth with knowledge and clarity. Information is sacred — it is the weapon against the darkness of corruption.</p>
+        <div class="pillar-mantra">या देवी सर्वभूतेषु</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── How It Works ────────────────────────────────────────────────────────────── -->
+<section class="how-section" aria-label="How to use">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">How SatyaVani Works</h2>
+      <p class="section-sub">Four steps. Complete anonymity. Real impact.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">०१</div>
+        <div class="step-icon">📝</div>
+        <h3>Prepare Your Report</h3>
+        <p>Write what you know. Upload documents, photos, videos, audio or any evidence. All file types supported.</p>
+      </div>
+      <div class="step-arrow" aria-hidden="true">→</div>
+      <div class="step-card">
+        <div class="step-num">०२</div>
+        <div class="step-icon">🔏</div>
+        <h3>Submit Anonymously</h3>
+        <p>Your IP is never recorded. Metadata is stripped from all files. No account required.</p>
+      </div>
+      <div class="step-arrow" aria-hidden="true">→</div>
+      <div class="step-card">
+        <div class="step-num">०३</div>
+        <div class="step-icon">🎫</div>
+        <h3>Receive Secret Token</h3>
+        <p>You get a unique tracking code. Save it carefully — it's the only way to check your report's status.</p>
+      </div>
+      <div class="step-arrow" aria-hidden="true">→</div>
+      <div class="step-card">
+        <div class="step-num">०४</div>
+        <div class="step-icon">🔍</div>
+        <h3>Track Progress</h3>
+        <p>Use your token to check status updates from our verification team.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Category Grid ───────────────────────────────────────────────────────────── -->
+<section class="categories-section" aria-label="Report categories">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Report Categories</h2>
+      <p class="section-sub">Every sector. Every institution. Every corrupt act.</p>
+    </div>
+    <div class="cat-grid">
+      {% for key, cat in categories.items() %}
+      <a href="{{ url_for('browse', cat=key) }}" class="cat-card" data-category="{{ key }}">
+        <span class="cat-icon">{{ cat.icon }}</span>
+        <span class="cat-label">{{ cat.label }}</span>
+        <span class="cat-np">{{ cat.np }}</span>
+        {% for row in cat_stats %}
+          {% if row.category == key %}
+          <span class="cat-count">{{ row.cnt }}</span>
+          {% endif %}
+        {% endfor %}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ── Recent Published Reports ───────────────────────────────────────────────── -->
+{% if recent %}
+<section class="recent-section" aria-label="Recent reports">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Recent Reports</h2>
+      <a href="{{ url_for('browse') }}" class="view-all">View All →</a>
+    </div>
+    <div class="reports-grid">
+      {% for r in recent %}
+      <article class="report-card urgency-{{ r.urgency }}">
+        <div class="report-card-top">
+          <span class="report-cat-badge">{{ (r.category | catinfo).icon }} {{ (r.category | catinfo).label }}</span>
+          <span class="report-urgency urgency-{{ r.urgency }}">{{ urgency_map[r.urgency].label if r.urgency in urgency_map else r.urgency }}</span>
+        </div>
+        <h3 class="report-card-title">
+          <a href="{{ url_for('view_report', token=r.token) }}">{{ r.title[:90] }}{% if r.title|length > 90 %}…{% endif %}</a>
+        </h3>
+        <div class="report-card-meta">
+          <span>📅 {{ r.created_at | fmtdate }}</span>
+          {% if r.province %}<span>📍 {{ r.province }}</span>{% endif %}
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ── Safety Banner ───────────────────────────────────────────────────────────── -->
+<section class="safety-section" aria-label="Safety information">
+  <div class="container">
+    <div class="safety-box">
+      <div class="safety-icon" aria-hidden="true">🛡️</div>
+      <div class="safety-content">
+        <h2>Your Protection is Our Priority</h2>
+        <p>SatyaVani is built on the principle of <strong>Abhaya</strong> (fearlessness). We never collect your IP address, require no registration, strip all file metadata, and are fully Tor-compatible. Use a VPN or Tor Browser for maximum protection.</p>
+        <div class="safety-tips">
+          <div class="tip">🌐 Use Tor Browser</div>
+          <div class="tip">📱 Use a public WiFi</div>
+          <div class="tip">🔐 Use a VPN</div>
+          <div class="tip">📵 Disable location</div>
+          <div class="tip">💾 Save your token offline</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

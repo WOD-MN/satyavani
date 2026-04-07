@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Track Report — सत्यवाणी{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <h1 class="page-title">🔍 Track Your Report</h1>
+    <p class="page-subtitle">आफ्नो प्रतिवेदनको अवस्था थाहा पाउनुहोस्</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="track-layout">
+    <div class="track-form-wrap">
+      <form method="POST" action="{{ url_for('track') }}" class="track-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+          <label for="token" class="form-label">
+            Enter Your Tracking Token
+            <span class="label-np">ट्र्याकिङ कोड</span>
+          </label>
+          <input type="text" id="token" name="token" class="form-control token-input"
+                 placeholder="e.g. aBcDeFgH1234…"
+                 autocomplete="off" spellcheck="false">
+        </div>
+        <button type="submit" class="btn btn-primary">
+          🔍 Track Report
+        </button>
+      </form>
+
+      {% if error %}
+      <div class="track-error">⚠️ {{ error }}</div>
+      {% endif %}
+    </div>
+
+    {% if report %}
+    <div class="track-result">
+      <div class="track-status-banner status-{{ report.status }}">
+        <span class="tsb-icon">{{ status_flow[report.status].icon if report.status in status_flow else '📋' }}</span>
+        <div>
+          <div class="tsb-label">Current Status</div>
+          <div class="tsb-value">{{ status_flow[report.status].label if report.status in status_flow else report.status }}</div>
+        </div>
+        {% if report.is_verified %}<div class="tsb-badge">✅ Verified</div>{% endif %}
+        {% if report.is_published %}<div class="tsb-badge">📢 Published</div>{% endif %}
+      </div>
+
+      <div class="track-detail-card">
+        <h2>{{ report.title }}</h2>
+        <div class="detail-meta">
+          <span>{{ (report.category | catinfo).icon }} {{ (report.category | catinfo).label }}</span>
+          <span>📅 {{ report.created_at | fmtdate }}</span>
+          {% if report.province %}<span>📍 {{ report.province }}{% if report.district %}, {{ report.district }}{% endif %}</span>{% endif %}
+          <span>🚦 Urgency: {{ urgency_map[report.urgency].label if report.urgency in urgency_map else report.urgency }}</span>
+          <span>👁 {{ report.views }} views</span>
+        </div>
+
+        {% if report.is_published %}
+        <div class="detail-desc">
+          <h4>Description</h4>
+          <p>{{ report.description[:1000] }}{% if report.description|length > 1000 %}…{% endif %}</p>
+        </div>
+        {% else %}
+        <div class="detail-desc-hidden">
+          <p>📋 Your report is under review. Full content not yet public.</p>
+        </div>
+        {% endif %}
+
+        {% if attachments %}
+        <div class="detail-attachments">
+          <h4>📎 Attachments ({{ attachments|length }})</h4>
+          <ul class="att-list">
+            {% for a in attachments %}
+            <li class="att-item">
+              <span class="att-icon">{% if a.file_type=='images' %}🖼️{% elif a.file_type=='videos' %}🎬{% elif a.file_type=='audio' %}🎵{% elif a.file_type=='documents' %}📄{% else %}📎{% endif %}</span>
+              <span class="att-name">{{ a.filename }}</span>
+              <span class="att-size">{{ a.file_size | fmtsize }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+        {% if report.admin_notes %}
+        <div class="admin-note-box">
+          <h4>📨 Message from Review Team</h4>
+          <p>{{ report.admin_notes }}</p>
+        </div>
+        {% endif %}
+      </div>
+
+      {% if history %}
+      <div class="status-timeline">
+        <h3>📅 Status History</h3>
+        <div class="timeline">
+          {% for h in history %}
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-content">
+              <div class="tl-status">
+                {% if h.old_status %}{{ h.old_status }} → {% endif %}
+                <strong>{{ h.new_status }}</strong>
+              </div>
+              {% if h.note %}<p class="tl-note">{{ h.note }}</p>{% endif %}
+              <div class="tl-date">{{ h.updated_at | fmtdate }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

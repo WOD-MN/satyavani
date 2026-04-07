@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}How It Works — SatyaVani{% endblock %}
+{% block content %}
+<section class="page-header">
+  <div class="container">
+    <div class="ph-icon"><i class="fas fa-info-circle"></i></div>
+    <h1>How SatyaVani Works <span class="devanagari-inline">कसरी काम गर्छ</span></h1>
+    <p>A secure, transparent, and anonymous platform for exposing corruption in Nepal</p>
+  </div>
+</section>
+<section class="section">
+  <div class="container narrow-lg">
+    <div class="hiw-grid">
+      <div class="hiw-card"><div class="hiw-num">01</div><div class="hiw-icon"><i class="fas fa-user-secret"></i></div><h3>Complete Anonymity</h3><p>We use cryptographic tokens instead of accounts. No email, no name, no phone number is ever collected. Our servers do not log IP addresses. You can use Tor Browser for maximum anonymity.</p></div>
+      <div class="hiw-card"><div class="hiw-num">02</div><div class="hiw-icon"><i class="fas fa-upload"></i></div><h3>Evidence Submission</h3><p>Upload documents (DOCX, PDF, Excel), images (JPG, PNG), videos (MP4, AVI), audio recordings (MP3, WAV), and archive files. We automatically strip metadata from uploaded files to protect your identity.</p></div>
+      <div class="hiw-card"><div class="hiw-num">03</div><div class="hiw-icon"><i class="fas fa-key"></i></div><h3>Your Tracking Token</h3><p>After submission, you receive a unique 43-character cryptographic token. This token allows you to check your report's status anonymously. Store it safely — it cannot be recovered.</p></div>
+      <div class="hiw-card"><div class="hiw-num">04</div><div class="hiw-icon"><i class="fas fa-search"></i></div><h3>Review & Verification</h3><p>Our team of investigators reviews each submission within 24-48 hours. Reports are assessed for credibility, cross-referenced with other cases, and categorized for action.</p></div>
+      <div class="hiw-card"><div class="hiw-num">05</div><div class="hiw-icon"><i class="fas fa-gavel"></i></div><h3>Escalation to Authorities</h3><p>Verified and credible reports are escalated to appropriate authorities including CIAA Nepal, National Vigilance Centre, Nepal Police Anti-Corruption Bureau, and international bodies.</p></div>
+      <div class="hiw-card"><div class="hiw-num">06</div><div class="hiw-icon"><i class="fas fa-globe"></i></div><h3>Publication</h3><p>Confirmed cases may be published publicly (with your consent, implied through submission) to increase public pressure and awareness around systemic corruption.</p></div>
+    </div>
+
+    <div class="myth-quote-box">
+      <div class="mqb-symbol">☸</div>
+      <blockquote>"न धर्मो धर्मवत् साक्षात् — Dharma itself is the greatest witness to righteousness."</blockquote>
+      <p>SatyaVani is built on the principle that truth, when brought to light, cannot be suppressed. Like Lord Vishnu's Sudarshana Chakra that cuts through darkness, every true report brings Nepal closer to justice.</p>
+    </div>
+
+    <div class="cta-box">
+      <h2>Ready to Report?</h2>
+      <p>It takes less than 5 minutes. Your identity is fully protected.</p>
+      <a href="{{ url_for('submit') }}" class="btn btn-primary btn-lg"><i class="fas fa-file-shield"></i> Submit Anonymous Report</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Safety Guide — SatyaVani{% endblock %}
+{% block content %}
+<section class="page-header">
+  <div class="container">
+    <div class="ph-icon"><i class="fas fa-shield-halved"></i></div>
+    <h1>Whistleblower Safety Guide <span class="devanagari-inline">सुरक्षा मार्गदर्शन</span></h1>
+    <p>Protect yourself before, during, and after submitting a report</p>
+  </div>
+</section>
+<section class="section">
+  <div class="container narrow-lg">
+    <div class="safety-grid">
+      <div class="safety-card danger-card">
+        <h3><i class="fas fa-exclamation-triangle"></i> Before Submitting</h3>
+        <ul>
+          <li>Use <strong>Tor Browser</strong> from the Tor Project website</li>
+          <li>Use a public WiFi network, not your home/office internet</li>
+          <li>Use a device that is not registered to your name if possible</li>
+          <li>Never tell anyone you plan to report</li>
+          <li>Remove metadata from files using MAT2 or ExifTool</li>
+          <li>Don't use your personal phone for photos — buy a disposable SIM</li>
+        </ul>
+      </div>
+      <div class="safety-card warning-card">
+        <h3><i class="fas fa-pen-to-square"></i> While Writing</h3>
+        <ul>
+          <li>Do NOT include your own name, address, or contact info</li>
+          <li>Avoid details that uniquely identify you as the source</li>
+          <li>Paraphrase quotes rather than using exact words that could identify you</li>
+          <li>Be careful with dates/times if you were the only witness</li>
+          <li>Use general terms ("a senior official") rather than specific titles</li>
+        </ul>
+      </div>
+      <div class="safety-card info-card">
+        <h3><i class="fas fa-file-image"></i> For Files & Evidence</h3>
+        <ul>
+          <li>Strip EXIF/metadata from photos before uploading</li>
+          <li>Remove author info from Word/PDF documents</li>
+          <li>Consider photographing documents rather than scanning (on anonymous device)</li>
+          <li>Audio recordings: use a dedicated device with no SIM card</li>
+          <li>Videos: disable location services before recording</li>
+        </ul>
+      </div>
+      <div class="safety-card success-card">
+        <h3><i class="fas fa-check-shield"></i> After Submitting</h3>
+        <ul>
+          <li>Save your token in a secure offline location (paper is safest)</li>
+          <li>Clear browser history and cookies</li>
+          <li>Use incognito/private mode for all follow-up visits</li>
+          <li>Do not discuss the report with colleagues or friends</li>
+          <li>Monitor for unusual activity around you</li>
+          <li>Know your legal rights as a whistleblower in Nepal</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="legal-box">
+      <h3>🇳🇵 Nepal Whistleblower Legal Protection</h3>
+      <p>Nepal's <strong>Corruption Prevention Act 2002</strong> and the <strong>Prevention of Corruption Act</strong> provide some protections for those who report corruption. The <strong>CIAA (Commission for Investigation of Abuse of Authority)</strong> is the primary anti-corruption body in Nepal.</p>
+      <p>If you face retaliation for reporting corruption, contact:</p>
+      <ul>
+        <li><strong>CIAA Nepal:</strong> (+977) 1-4211761 | ciaa.gov.np</li>
+        <li><strong>NVC Nepal:</strong> nvc.gov.np</li>
+        <li><strong>Human Rights Commission:</strong> nhrc.org.np</li>
+        <li><strong>Accountability Lab Nepal:</strong> accountabilitylab.org</li>
+      </ul>
+    </div>
+  </div>
+</section>
+{% endblock %}

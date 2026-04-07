@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Settings — Admin{% endblock %}
+{% block content %}
+<div class="admin-wrap">
+  <div class="admin-topbar">
+    <div class="atp-left">
+      <a href="{{ url_for('admin_dashboard') }}" class="btn btn-sm btn-outline">← Dashboard</a>
+      <h1>⚙️ Settings & Security</h1>
+    </div>
+    <div class="atp-right">
+      <a href="{{ url_for('admin_audit') }}" class="btn btn-sm btn-outline">📜 Audit Log</a>
+      <a href="{{ url_for('admin_sessions') }}" class="btn btn-sm btn-outline">🖥️ Sessions</a>
+      <a href="{{ url_for('admin_2fa_enroll') }}" class="btn btn-sm btn-outline">🔐 Manage 2FA</a>
+      <a href="{{ url_for('admin_logout') }}" class="btn btn-sm btn-danger">🚪 Logout</a>
+    </div>
+  </div>
+
+  <div class="settings-grid">
+    <!-- Site Settings -->
+    <div class="settings-card">
+      <h3>🌐 Site Settings</h3>
+      <form method="POST" action="{{ url_for('admin_settings') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+          <label class="form-label">Site Active</label>
+          <select name="site_active" class="form-control">
+            <option value="1" {% if settings.get('site_active')=='1' %}selected{% endif %}>✅ Active</option>
+            <option value="0" {% if settings.get('site_active')=='0' %}selected{% endif %}>⛔ Offline</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Submissions Open</label>
+          <select name="submission_open" class="form-control">
+            <option value="1" {% if settings.get('submission_open')=='1' %}selected{% endif %}>✅ Open</option>
+            <option value="0" {% if settings.get('submission_open')=='0' %}selected{% endif %}>⛔ Closed</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Max Failed Logins</label>
+          <input type="number" name="max_failed_logins" class="form-control" value="{{ settings.get('max_failed_logins','5') }}" min="3" max="20">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Lockout Duration (minutes)</label>
+          <input type="number" name="lockout_minutes" class="form-control" value="{{ settings.get('lockout_minutes','30') }}" min="5" max="1440">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Announcement Banner</label>
+          <textarea name="announcement" class="form-control" rows="2">{{ settings.get('announcement','') }}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">💾 Save Settings</button>
+      </form>
+    </div>
+
+    <!-- Password Change -->
+    <div class="settings-card">
+      <h3>🔑 Change Password</h3>
+      <div class="pw-requirements">
+        <strong>Requirements:</strong>
+        <ul>
+          <li>✅ Minimum 12 characters</li>
+          <li>✅ Mix of upper/lowercase, numbers, symbols</li>
+          <li>✅ Stored: PBKDF2-HMAC-SHA512 (480,000 iterations)</li>
+        </ul>
+      </div>
+      <form method="POST" action="{{ url_for('admin_settings') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+          <label class="form-label">New Password</label>
+          <input type="password" name="new_password" id="newPw" class="form-control" placeholder="Min 12 characters" autocomplete="new-password">
+          <div class="pw-strength-bar"><div id="pwStrengthFill"></div></div>
+          <small id="pwStrengthLabel" style="color:var(--clr-text-faint);font-size:.78rem"></small>
+        </div>
+        <button type="submit" class="btn btn-outline" style="width:100%">🔐 Update Password</button>
+      </form>
+    </div>
+
+    <!-- 2FA Status -->
+    <div class="settings-card">
+      <h3>🔐 Two-Factor Authentication</h3>
+      {% if admin.totp_enabled %}
+      <div class="flash-msg flash-success" style="margin-bottom:1rem">✅ 2FA is ENABLED — RFC 6238 TOTP</div>
+      {% else %}
+      <div class="flash-msg flash-warning" style="margin-bottom:1rem">⚠️ 2FA is NOT enabled. Enable it now.</div>
+      {% endif %}
+      <p style="color:var(--clr-text-muted);font-size:.88rem;margin-bottom:1rem">
+        Compatible with Google Authenticator, Aegis, Bitwarden, 1Password, and all RFC 6238 TOTP apps.
+        Codes rotate every 30 seconds using HMAC-SHA1.
+      </p>
+      <a href="{{ url_for('admin_2fa_enroll') }}" class="btn btn-primary">
+        {% if admin.totp_enabled %}⚙️ Manage 2FA{% else %}🔐 Enable 2FA{% endif %}
+      </a>
+    </div>
+
+    <!-- Security Status -->
+    <div class="settings-card enc-info-card">
+      <h3>🛡️ Platform Security Status</h3>
+      <ul class="enc-status-list">
+        <li><span class="enc-ok">✅</span> AES-256-GCM field encryption (all sensitive fields)</li>
+        <li><span class="enc-ok">✅</span> AES-256-GCM file encryption (per-file random keys)</li>
+        <li><span class="enc-ok">✅</span> PBKDF2-HMAC-SHA512 passwords (480k iterations)</li>
+        <li><span class="enc-ok">✅</span> HMAC-SHA3-256 tamper-evident audit chain</li>
+        <li><span class="enc-ok">✅</span> HMAC-SHA3-256 signed tracking tokens</li>
+        <li><span class="enc-ok">✅</span> Server-side session store (not cookie/JWT)</li>
+        <li><span class="enc-ok">✅</span> IP brute-force lockout (hashed, no raw IPs)</li>
+        <li><span class="enc-ok">✅</span> SHA3-256 file integrity verification</li>
+        <li><span class="enc-ok">✅</span> DoD 3-pass secure file deletion</li>
+        <li><span class="enc-ok">✅</span> Content Security Policy (CSP headers)</li>
+        <li><span class="enc-ok">✅</span> HSTS + X-Frame + No-Sniff headers</li>
+        <li><span class="enc-ok">✅</span> CSRF tokens on all forms</li>
+        <li><span class="enc-ok">✅</span> No raw IPs stored anywhere</li>
+        <li><span class="enc-ok">✅</span> DB secure_delete pragma (zero-fill)</li>
+      </ul>
+      <a href="{{ url_for('admin_audit') }}" class="btn btn-outline btn-sm" style="margin-top:1rem">📜 View Audit Chain →</a>
+    </div>
+  </div>
+</div>
+<script>
+const pw = document.getElementById('newPw');
+const bar = document.getElementById('pwStrengthFill');
+const lbl = document.getElementById('pwStrengthLabel');
+if (pw) {
+  pw.addEventListener('input', () => {
+    const v = pw.value; let score = 0;
+    if (v.length >= 12) score++;
+    if (v.length >= 16) score++;
+    if (/[A-Z]/.test(v)) score++;
+    if (/[0-9]/.test(v)) score++;
+    if (/[^A-Za-z0-9]/.test(v)) score++;
+    bar.style.width = (score*20)+'%';
+    bar.style.background = score<2?'#c62828':score<4?'#e65100':'#2e7d32';
+    lbl.textContent = ['','Weak','Fair','Good','Strong','Very Strong'][score]||'';
+  });
+}
+</script>
+{% endblock %}

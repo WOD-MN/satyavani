@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% block title %}Report: {{ report.title[:50] }} — Admin{% endblock %}
+{% block content %}
+<div class="admin-wrap">
+  <div class="admin-topbar">
+    <div class="atp-left">
+      <a href="{{ url_for('admin_dashboard') }}" class="btn btn-sm btn-outline">← Dashboard</a>
+      <h1>📋 Report Detail <span class="atp-enc-badge">🔓 Decrypted View</span></h1>
+    </div>
+    <div class="atp-right">
+      <a href="{{ url_for('admin_audit') }}" class="btn btn-sm btn-outline">📜 Audit Log</a>
+      <a href="{{ url_for('admin_logout') }}" class="btn btn-sm btn-danger">🚪 Logout</a>
+    </div>
+  </div>
+
+  <!-- Integrity Banner -->
+  {% if integrity_ok is not none %}
+  <div class="integrity-banner {% if integrity_ok %}integrity-ok{% else %}integrity-fail{% endif %}">
+    {% if integrity_ok %}
+    🔐 <strong>Content Integrity Verified</strong> — SHA3-256 hash matches stored digest. Report has not been tampered with.
+    {% else %}
+    ⚠️ <strong>INTEGRITY WARNING</strong> — SHA3-256 hash MISMATCH. Report content may have been altered. Investigate immediately.
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <div class="rd-layout">
+    <!-- ── Left: Full Decrypted Report ──────────────────────────────── -->
+    <div class="rd-main">
+
+      <!-- Header -->
+      <div class="rd-header">
+        <div class="rd-badges">
+          <span class="report-cat-badge">{{ (report.category | catinfo).icon }} {{ (report.category | catinfo).label }}</span>
+          <span class="urgency-dot urgency-{{ report.urgency }}">{{ report.urgency | upper }}</span>
+          <span class="status-badge status-{{ report.status }}">
+            {{ status_flow[report.status].icon if report.status in status_flow else '📋' }}
+            {{ status_flow[report.status].label if report.status in status_flow else report.status }}
+          </span>
+          {% if report.is_verified  %}<span class="badge-mini badge-green">✅ Verified</span>{% endif %}
+          {% if report.is_published %}<span class="badge-mini badge-blue">📢 Published</span>{% endif %}
+          {% if report.is_flagged   %}<span class="badge-mini badge-red">🚩 Flagged</span>{% endif %}
+        </div>
+        <h2 class="rd-title">{{ report.title }}</h2>
+        <div class="rd-meta-grid">
+          <div class="rm-item"><span class="rm-lbl">Token ID</span><code class="mono-sm">{{ report.token_id }}</code></div>
+          <div class="rm-item"><span class="rm-lbl">Submitted</span>{{ report.created_at | fmtdate }}</div>
+          <div class="rm-item"><span class="rm-lbl">Updated</span>{{ report.updated_at | fmtdate }}</div>
+          <div class="rm-item"><span class="rm-lbl">Province</span>{{ report.province or '—' }}</div>
+          {% if report.district %}<div class="rm-item"><span class="rm-lbl">District</span>{{ report.district }}</div>{% endif %}
+          {% if report.subcategory %}<div class="rm-item"><span class="rm-lbl">Sub-category</span>{{ report.subcategory }}</div>{% endif %}
+          <div class="rm-item"><span class="rm-lbl">Language</span>{{ report.language }}</div>
+          <div class="rm-item"><span class="rm-lbl">Views</span>{{ report.views }}</div>
+          <div class="rm-item rm-hash">
+            <span class="rm-lbl">Content Hash (SHA3-256)</span>
+            <code class="mono-xs">{{ report.content_hash[:32] }}…</code>
+          </div>
+        </div>
+      </div>
+
+      <!-- Full Decrypted Description -->
+      <div class="rd-description">
+        <div class="rd-section-head">
+          <h3>📄 Full Report Content</h3>
+          <span class="enc-indicator">🔐 AES-256-GCM Encrypted at Rest</span>
+        </div>
+        <div class="rd-desc-content">{{ report.description | nl2br }}</div>
+        <div class="rd-wordcount">
+          {{ report.description | length }} characters · ~{{ (report.description | length // 5) }} words
+        </div>
+      </div>
+
+      <!-- Attachments with decrypt + download -->
+      {% if attachments %}
+      <div class="rd-attachments">
+        <div class="rd-section-head">
+          <h3>📎 Encrypted Evidence Files ({{ attachments|length }})</h3>
+          <span class="enc-indicator">🔐 AES-256-GCM per-file encryption</span>
+        </div>
+        {% for a in attachments %}
+        <div class="att-card-admin">
+          <div class="att-icon-lg">
+            {% if a.file_type=='images' %}🖼️
+            {% elif a.file_type=='videos' %}🎬
+            {% elif a.file_type=='audio' %}🎵
+            {% elif a.file_type=='documents' %}📄
+            {% else %}📎{% endif %}
+          </div>
+          <div class="att-info">
+            <div class="att-fname">{{ a.filename }}</div>
+            <div class="att-fmeta">
+              <span>{{ a.file_size | fmtsize }} original</span>
+              <span>•</span>
+              <span>{{ a.enc_size | fmtsize }} encrypted</span>
+              <span>•</span>
+              <span class="att-type">{{ a.file_type }}</span>
+            </div>
+            {% if a.sha3_digest %}
+            <div class="att-hash">
+              <span class="rm-lbl">SHA3-256:</span>
+              <code class="mono-xs">{{ a.sha3_digest[:40] }}…</code>
+            </div>
+            {% endif %}
+            <div class="att-fdate">Uploaded: {{ a.uploaded_at | fmtdate }}</div>
+          </div>
+          <div class="att-actions">
+            <a href="{{ url_for('admin_download_file', att_id=a.id) }}"
+               class="btn btn-sm btn-primary"
+               title="Decrypt and download {{ a.filename }}">
+              🔓 Decrypt & Download
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Admin Notes (visible to submitter via track) -->
+      {% if report.admin_notes %}
+      <div class="rd-admin-notes">
+        <div class="rd-section-head">
+          <h3>📨 Notes to Submitter</h3>
+          <span class="enc-indicator">🔐 Encrypted</span>
+        </div>
+        <div class="rd-notes-content">{{ report.admin_notes | nl2br }}</div>
+      </div>
+      {% endif %}
+
+      <!-- Status Timeline -->
+      {% if history %}
+      <div class="rd-timeline">
+        <h3>📅 Status History</h3>
+        <div class="timeline">
+          {% for h in history %}
+          <div class="tl-item">
+            <div class="tl-dot {% if loop.last %}tl-dot-current{% endif %}"></div>
+            <div class="tl-content">
+              <div class="tl-status">
+                {% if h.old_status %}<span class="tl-old">{{ h.old_status }}</span> → {% endif %}
+                <strong class="tl-new status-{{ h.new_status }}">{{ h.new_status }}</strong>
+              </div>
+              {% if h.note %}<p class="tl-note">{{ h.note }}</p>{% endif %}
+              <div class="tl-date">{{ h.updated_at | fmtdate }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- ── Right: Action Panel ───────────────────────────────────── -->
+    <div class="rd-sidebar">
+
+      <!-- Status & Flags Update -->
+      <div class="rd-action-card">
+        <h3>⚡ Update Report</h3>
+        <form method="POST" action="{{ url_for('admin_update_report', token_id=report.token_id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-control">
+              {% for k,v in all_statuses.items() %}
+              <option value="{{ k }}" {% if report.status==k %}selected{% endif %}>
+                {{ v.icon }} {{ v.label }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Status Note (visible to submitter)</label>
+            <textarea name="status_note" class="form-control" rows="3"
+                      placeholder="e.g. Your report is under active investigation…"></textarea>
+            <small class="field-hint">This is encrypted and shown on the tracking page.</small>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Internal Admin Notes</label>
+            <textarea name="admin_notes" class="form-control" rows="5"
+                      placeholder="Internal notes for admin team only…">{{ report.admin_notes }}</textarea>
+            <small class="field-hint">Stored encrypted. Not visible to submitter unless published.</small>
+          </div>
+
+          <div class="form-checks">
+            <label class="check-label">
+              <input type="checkbox" name="is_verified" {% if report.is_verified %}checked{% endif %}>
+              ✅ Mark as Verified
+            </label>
+            <label class="check-label">
+              <input type="checkbox" name="is_published" {% if report.is_published %}checked{% endif %}>
+              📢 Publish Publicly
+            </label>
+            <label class="check-label">
+              <input type="checkbox" name="is_flagged" {% if report.is_flagged %}checked{% endif %}>
+              🚩 Flag for Review
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width:100%">💾 Save Changes</button>
+        </form>
+      </div>
+
+      <!-- Encryption Info -->
+      <div class="rd-action-card enc-info-card">
+        <h3>🔐 Encryption Status</h3>
+        <ul class="enc-status-list">
+          <li><span class="enc-ok">✅</span> Report text: AES-256-GCM</li>
+          <li><span class="enc-ok">✅</span> All filenames: AES-256-GCM</li>
+          <li><span class="enc-ok">✅</span> Admin notes: AES-256-GCM</li>
+          <li><span class="enc-ok">✅</span> Status notes: AES-256-GCM</li>
+          <li><span class="enc-ok">✅</span> Files at rest: per-file key</li>
+          <li><span class="enc-ok">✅</span> Content: SHA3-256 hash</li>
+          <li><span class="enc-ok">✅</span> Token: HMAC-SHA3-256</li>
+          <li><span class="enc-ok">✅</span> No IP stored</li>
+        </ul>
+        <div class="key-info">
+          Master key purpose: <code>reports:v1</code><br>
+          KDF: PBKDF2-HMAC-SHA512<br>
+          Iterations: 600,000
+        </div>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="rd-action-card danger-card">
+        <h3>⛔ Danger Zone</h3>
+        <p>Delete this report and all encrypted files (3-pass DoD wipe). Irreversible.</p>
+        <form method="POST"
+              action="{{ url_for('admin_delete_report', token_id=report.token_id) }}"
+              onsubmit="return confirm('PERMANENTLY delete this report?\n\nAll files will be securely wiped (3-pass).\nThis action is logged in the audit trail.')">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-danger" style="width:100%">🗑️ Secure Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

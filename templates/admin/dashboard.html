@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard — सत्यवाणी{% endblock %}
+{% block content %}
+<div class="admin-wrap">
+  <div class="admin-topbar">
+    <div class="atp-left"><h1>🔱 SatyaVani Admin</h1></div>
+    <div class="atp-right">
+      <span style="font-size:.85rem;color:var(--clr-text-muted)">👤 {{ session.get('username','') }}</span>
+      <a href="{{ url_for('admin_settings') }}"  class="btn btn-sm btn-outline">⚙️ Settings</a>
+      <a href="{{ url_for('admin_audit') }}"     class="btn btn-sm btn-outline">📜 Audit</a>
+      <a href="{{ url_for('admin_sessions') }}"  class="btn btn-sm btn-outline">🖥️ Sessions</a>
+      <a href="{{ url_for('admin_export') }}"    class="btn btn-sm btn-outline">📥 Export</a>
+      <a href="{{ url_for('admin_logout') }}"    class="btn btn-sm btn-danger">🚪 Logout</a>
+    </div>
+  </div>
+
+  <!-- Stats row -->
+  <div class="admin-stats-row">
+    <div class="admin-stat-card"><div class="asc-n">{{ stats.total }}</div><div class="asc-l">Total</div></div>
+    <div class="admin-stat-card asc-warn"><div class="asc-n">{{ stats.received }}</div><div class="asc-l">New</div></div>
+    <div class="admin-stat-card"><div class="asc-n">{{ stats.reviewing }}</div><div class="asc-l">Reviewing</div></div>
+    <div class="admin-stat-card asc-success"><div class="asc-n">{{ stats.verified }}</div><div class="asc-l">Verified</div></div>
+    <div class="admin-stat-card"><div class="asc-n">{{ stats.published }}</div><div class="asc-l">Published</div></div>
+    <div class="admin-stat-card asc-danger"><div class="asc-n">{{ stats.critical }}</div><div class="asc-l">Critical</div></div>
+    <div class="admin-stat-card asc-warn"><div class="asc-n">{{ stats.flagged }}</div><div class="asc-l">Flagged</div></div>
+  </div>
+
+  <!-- Encryption notice -->
+  <div class="enc-notice">
+    🔐 All report titles are <strong>AES-256-GCM decrypted</strong> in real-time for admin display.
+    Plaintext never persisted to logs. SHA3-256 integrity checked per report.
+  </div>
+
+  <!-- Toolbar -->
+  <div class="admin-toolbar">
+    <form method="GET" class="admin-search-form">
+      <input type="text" name="q" value="{{ search }}" placeholder="Search decrypted titles or token IDs…" class="form-control">
+      <select name="status" class="form-control">
+        <option value="">All Status</option>
+        {% for k,v in status_flow.items() %}
+        <option value="{{ k }}" {% if flt_status==k %}selected{% endif %}>{{ v.icon }} {{ v.label }}</option>
+        {% endfor %}
+      </select>
+      <select name="cat" class="form-control">
+        <option value="">All Categories</option>
+        {% for k,v in categories.items() %}
+        <option value="{{ k }}" {% if flt_cat==k %}selected{% endif %}>{{ v.icon }} {{ v.label }}</option>
+        {% endfor %}
+      </select>
+      <select name="urg" class="form-control">
+        <option value="">All Urgency</option>
+        {% for k,v in urgency_map.items() %}
+        <option value="{{ k }}" {% if flt_urg==k %}selected{% endif %}>{{ v.label }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-primary">🔍 Filter</button>
+      <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline">✖ Clear</a>
+    </form>
+  </div>
+
+  <div class="admin-table-wrap">
+    <p class="admin-count">{{ reports|length }} / {{ total }} reports (Page {{ page }}/{{ pages if pages > 0 else 1 }})</p>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Token ID (first 16)</th>
+          <th>Title (Decrypted)</th>
+          <th>Cat</th>
+          <th>Urgency</th>
+          <th>Status</th>
+          <th>Files</th>
+          <th>Province</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in reports %}
+        <tr class="{% if r.urgency=='critical' %}tr-critical{% elif r.is_flagged %}tr-flagged{% elif r.status=='received' %}tr-new{% endif %}">
+          <td><code class="mono-xs">{{ r.token_id[:16] }}…</code></td>
+          <td class="td-title">
+            <a href="{{ url_for('admin_report', token_id=r.token_id) }}">
+              {{ r.title[:65] }}{% if r.title|length > 65 %}…{% endif %}
+            </a>
+            {% if r.is_verified  %}<span class="badge-mini badge-green">✅</span>{% endif %}
+            {% if r.is_published %}<span class="badge-mini badge-blue">📢</span>{% endif %}
+            {% if r.is_flagged   %}<span class="badge-mini badge-red">🚩</span>{% endif %}
+          </td>
+          <td>{{ (r.category | catinfo).icon }}</td>
+          <td><span class="report-urgency urgency-{{ r.urgency }}">{{ r.urgency }}</span></td>
+          <td><span class="status-badge status-{{ r.status }}">{{ r.status }}</span></td>
+          <td class="td-att">{% if r.att_count > 0 %}📎 {{ r.att_count }}{% else %}—{% endif %}</td>
+          <td>{{ r.province or '—' }}</td>
+          <td class="td-date">{{ r.created_at[:10] }}</td>
+          <td>
+            <a href="{{ url_for('admin_report', token_id=r.token_id) }}" class="btn btn-sm btn-outline">
+              🔓 View
+            </a>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9" class="td-empty">No reports found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if pages > 1 %}
+  <div class="pagination">
+    {% if page > 1 %}<a href="{{ url_for('admin_dashboard', page=page-1, status=flt_status, cat=flt_cat, urg=flt_urg, q=search) }}" class="page-btn">← Prev</a>{% endif %}
+    {% for p in range(1, pages+1) %}
+    <a href="{{ url_for('admin_dashboard', page=p, status=flt_status, cat=flt_cat, urg=flt_urg, q=search) }}" class="page-btn {% if p==page %}active{% endif %}">{{ p }}</a>
+    {% endfor %}
+    {% if page < pages %}<a href="{{ url_for('admin_dashboard', page=page+1, status=flt_status, cat=flt_cat, urg=flt_urg, q=search) }}" class="page-btn">Next →</a>{% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

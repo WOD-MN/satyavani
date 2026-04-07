@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self' 'unsafe-inline';">
+  <title>{% block title %}सत्यवाणी — SatyaVani{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Sanskrit:ital@0;1&family=Cinzel+Decorative:wght@400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <!-- ── Particle Canvas ─────────────────────────────────────────────────── -->
+  <canvas id="particleCanvas"></canvas>
+
+  <!-- ── Sacred Geometric Background ───────────────────────────────────────── -->
+  <div class="mandala-bg" aria-hidden="true">
+    <div class="mandala-ring ring-1"></div>
+    <div class="mandala-ring ring-2"></div>
+    <div class="mandala-ring ring-3"></div>
+  </div>
+
+  <!-- ── Navigation ────────────────────────────────────────────────────────── -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="{{ url_for('index') }}" class="nav-brand" aria-label="SatyaVani Home">
+        <span class="brand-trishul" aria-hidden="true">&#x1D112;</span>
+        <span class="brand-devanagari">सत्यवाणी</span>
+        <span class="brand-roman">SatyaVani</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks" role="list">
+        <li><a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint=='index' %}active{% endif %}">
+          <span class="nav-icon">🏠</span> Home
+        </a></li>
+        <li><a href="{{ url_for('submit') }}" class="nav-link nav-cta {% if request.endpoint=='submit' %}active{% endif %}">
+          <span class="nav-icon">🔏</span> Submit Report
+        </a></li>
+        <li><a href="{{ url_for('track') }}" class="nav-link {% if request.endpoint=='track' %}active{% endif %}">
+          <span class="nav-icon">🔍</span> Track
+        </a></li>
+        <li><a href="{{ url_for('browse') }}" class="nav-link {% if request.endpoint=='browse' %}active{% endif %}">
+          <span class="nav-icon">📂</span> Browse
+        </a></li>
+        <li><a href="{{ url_for('about') }}" class="nav-link {% if request.endpoint=='about' %}active{% endif %}">
+          <span class="nav-icon">⚖️</span> About
+        </a></li>
+        <li><a href="{{ url_for('guide') }}" class="nav-link {% if request.endpoint=='guide' %}active{% endif %}">
+          <span class="nav-icon">📘</span> Guide
+        </a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ── Alert Banner ──────────────────────────────────────────────────────── -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-container" role="alert" aria-live="polite">
+        {% for cat, msg in messages %}
+          <div class="flash-msg flash-{{ cat }}">
+            <span class="flash-icon">
+              {% if cat == 'success' %}✅{% elif cat == 'danger' %}🚨{% elif cat == 'warning' %}⚠️{% else %}ℹ️{% endif %}
+            </span>
+            <span>{{ msg }}</span>
+            <button class="flash-close" onclick="this.parentElement.remove()" aria-label="Close">×</button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- ── Main Content ───────────────────────────────────────────────────────── -->
+  <main class="main-content" role="main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ── Footer ────────────────────────────────────────────────────────────── -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-mandala" aria-hidden="true">
+      <svg viewBox="0 0 200 200" class="dharmachakra-svg">
+        <circle cx="100" cy="100" r="90" fill="none" stroke="currentColor" stroke-width="2" opacity="0.3"/>
+        <circle cx="100" cy="100" r="60" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+        <circle cx="100" cy="100" r="12" fill="none" stroke="currentColor" stroke-width="2" opacity="0.6"/>
+        {% for i in range(24) %}
+        <line x1="100" y1="10" x2="100" y2="40"
+              transform="rotate({{ i*15 }},100,100)"
+              stroke="currentColor" stroke-width="1.2" opacity="0.35"/>
+        {% endfor %}
+        {% for i in range(8) %}
+        <line x1="100" y1="40" x2="100" y2="88"
+              transform="rotate({{ i*45 }},100,100)"
+              stroke="currentColor" stroke-width="2" opacity="0.55"/>
+        {% endfor %}
+      </svg>
+    </div>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <p class="footer-mantra">सत्यमेव जयते</p>
+        <p class="footer-mantra-sub">Truth Alone Triumphs</p>
+        <p class="footer-desc">
+          सत्यवाणी is a secure, anonymous whistleblower platform inspired by
+          the Dharma of Yama — the cosmic principle that no corrupt act escapes
+          the eye of truth. Your identity is protected. Your voice matters.
+        </p>
+      </div>
+      <div class="footer-links">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="{{ url_for('submit') }}">Submit a Report</a></li>
+          <li><a href="{{ url_for('track') }}">Track Your Report</a></li>
+          <li><a href="{{ url_for('browse') }}">Browse Reports</a></li>
+          <li><a href="{{ url_for('guide') }}">Safety Guide</a></li>
+          <li><a href="{{ url_for('about') }}">About & Mission</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Protection</h4>
+        <ul>
+          <li>🔒 No IP Logging</li>
+          <li>🕵️ Anonymous Submission</li>
+          <li>🗑️ Metadata Stripped</li>
+          <li>🛡️ Encrypted Storage</li>
+          <li>🌐 Tor Compatible</li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Emergency</h4>
+        <ul>
+          <li>CIAA Nepal: 1113</li>
+          <li>Anti-Corruption Hotline</li>
+          <li>Human Rights Commission</li>
+          <li>Press Council Nepal</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>धर्मो रक्षति रक्षितः — Dharma protects those who protect it.</p>
+      <p>SatyaVani is an independent, non-partisan platform. We do not store your identity.</p>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

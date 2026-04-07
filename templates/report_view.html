@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ report.title }} — सत्यवाणी{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="report-view-layout">
+    <article class="report-full">
+      <div class="rv-header">
+        <div class="rv-badges">
+          <span class="report-cat-badge">{{ (report.category | catinfo).icon }} {{ (report.category | catinfo).label }}</span>
+          <span class="report-urgency urgency-{{ report.urgency }}">{{ urgency_map[report.urgency].label if report.urgency in urgency_map else report.urgency }}</span>
+          {% if report.is_verified %}<span class="verified-badge">✅ Verified</span>{% endif %}
+        </div>
+        <h1 class="rv-title">{{ report.title }}</h1>
+        <div class="rv-meta">
+          <span>📅 {{ report.created_at | fmtdate }}</span>
+          {% if report.province %}<span>📍 {{ report.province }}{% if report.district %}, {{ report.district }}{% endif %}</span>{% endif %}
+          <span>👁 {{ report.views }} views</span>
+          <span class="status-badge status-{{ report.status }}">{{ status_flow[report.status].label if report.status in status_flow else report.status }}</span>
+        </div>
+      </div>
+      <div class="rv-body">{{ report.description | nl2br }}</div>
+
+      {% if attachments %}
+      <div class="rv-attachments">
+        <h3>📎 Evidence Attachments ({{ attachments|length }})</h3>
+        <div class="att-grid">
+          {% for a in attachments %}
+          <div class="att-card att-{{ a.file_type }}">
+            <div class="att-card-icon">{% if a.file_type=='images' %}🖼️{% elif a.file_type=='videos' %}🎬{% elif a.file_type=='audio' %}🎵{% elif a.file_type=='documents' %}📄{% else %}📎{% endif %}</div>
+            <div class="att-card-info">
+              <div class="att-card-name">{{ a.filename }}</div>
+              <div class="att-card-size">{{ a.file_size | fmtsize }} · {{ a.file_type }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </article>
+
+    <aside class="rv-sidebar">
+      <div class="sidebar-widget">
+        <h4>Share This Report</h4>
+        <p>Help amplify the truth. Share this report token:</p>
+        <code class="share-token">{{ report.token }}</code>
+      </div>
+      <div class="sidebar-widget">
+        <h4>Similar Reports</h4>
+        <p><a href="{{ url_for('browse', cat=report.category) }}">Browse more {{ (report.category | catinfo).label }} reports →</a></p>
+      </div>
+      <div class="sidebar-widget">
+        <h4>Submit Your Own</h4>
+        <a href="{{ url_for('submit') }}" class="btn btn-primary" style="width:100%">🔏 Submit Anonymously</a>
+      </div>
+    </aside>
+  </div>
+</div>
+{% endblock %}

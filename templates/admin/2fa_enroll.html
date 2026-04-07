@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Enroll 2FA — Admin{% endblock %}
+{% block content %}
+<div class="admin-wrap">
+  <div class="admin-topbar">
+    <a href="{{ url_for('admin_settings') }}" class="btn btn-sm btn-outline">← Settings</a>
+    <h1>🔐 Two-Factor Authentication Enrollment</h1>
+  </div>
+  <div class="settings-card" style="max-width:580px">
+    {% if user.totp_enabled %}
+    <div class="flash-msg flash-success" style="margin-bottom:1.5rem">✅ 2FA is currently ENABLED on your account.</div>
+    <form method="POST" action="{{ url_for('admin_2fa_enroll') }}"
+          onsubmit="return confirm('Disable 2FA? This reduces your account security.')">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="action" value="disable">
+      <button type="submit" class="btn btn-danger" style="width:100%">🔓 Disable 2FA</button>
+    </form>
+    {% else %}
+    <h3 style="margin-bottom:1rem">Set Up Google Authenticator / Aegis</h3>
+    <ol style="color:var(--clr-text-muted);line-height:2;margin-bottom:1.5rem;padding-left:1.5rem;list-style:decimal">
+      <li>Install <strong>Google Authenticator</strong>, <strong>Aegis</strong>, or any RFC 6238 TOTP app</li>
+      <li>Add a new account manually using the secret key below</li>
+      <li>Enter the 6-digit code to confirm enrollment</li>
+    </ol>
+
+    <div class="totp-secret-box">
+      <div class="totp-label">🔑 Manual Entry Secret Key</div>
+      <code class="totp-secret" id="totpSecret">{{ secret }}</code>
+      <button onclick="copySecret()" class="btn btn-sm btn-outline" style="margin-top:.5rem">📋 Copy Secret</button>
+    </div>
+
+    <div class="totp-uri-box">
+      <div class="totp-label">📲 OTPAuth URI (paste into app)</div>
+      <textarea class="form-control" rows="3" readonly style="font-size:.7rem;font-family:var(--font-mono)">{{ uri }}</textarea>
+    </div>
+
+    <div class="totp-timer">
+      ⏱️ Current code: <span id="livecode" style="font-family:var(--font-mono);font-size:1.4rem;color:var(--clr-gold-pale)">------</span>
+      <span id="timeleft" style="font-size:.8rem;color:var(--clr-text-faint)"></span>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin_2fa_enroll') }}" style="margin-top:1.5rem">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="totp_secret" value="{{ secret }}">
+      <div class="form-group">
+        <label class="form-label">Enter 6-digit code to verify</label>
+        <input type="text" name="code" class="form-control"
+               placeholder="000000" maxlength="6" pattern="[0-9]{6}"
+               autocomplete="off"
+               style="font-family:var(--font-mono);font-size:1.4rem;letter-spacing:.4em;text-align:center">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%">✅ Verify & Enable 2FA</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+<script>
+function copySecret() {
+  navigator.clipboard.writeText(document.getElementById('totpSecret').textContent);
+  alert('Secret copied! Store it securely as a backup.');
+}
+
+// Live TOTP preview (client-side RFC 6238 using SubtleCrypto)
+async function computeTOTP(base32secret) {
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  let bits = '';
+  for (const c of base32secret.toUpperCase().replace(/=/g,'')) {
+    const idx = alphabet.indexOf(c);
+    if (idx === -1) continue;
+    bits += idx.toString(2).padStart(5,'0');
+  }
+  const bytes = new Uint8Array(Math.floor(bits.length/8));
+  for (let i=0; i<bytes.length; i++) bytes[i] = parseInt(bits.slice(i*8,i*8+8),2);
+
+  const counter = Math.floor(Date.now()/1000/30);
+  const ctrBuf  = new Uint8Array(8);
+  const view    = new DataView(ctrBuf.buffer);
+  view.setUint32(4, counter, false);
+
+  const key = await crypto.subtle.importKey('raw', bytes, {name:'HMAC',hash:'SHA-1'}, false, ['sign']);
+  const sig  = new Uint8Array(await crypto.subtle.sign('HMAC', key, ctrBuf));
+  const off  = sig[sig.length-1] & 0x0F;
+  const code = (((sig[off]&0x7F)<<24|(sig[off+1]&0xFF)<<16|(sig[off+2]&0xFF)<<8|(sig[off+3]&0xFF)) % 1000000);
+  return code.toString().padStart(6,'0');
+}
+
+const sec = {{ secret | tojson }};
+async function updateCode() {
+  const code = await computeTOTP(sec);
+  document.getElementById('livecode').textContent = code;
+  const rem = 30 - (Math.floor(Date.now()/1000) % 30);
+  document.getElementById('timeleft').textContent = `(${rem}s remaining)`;
+}
+if (sec) { updateCode(); setInterval(updateCode, 1000); }
+</script>
+{% endblock %}

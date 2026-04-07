@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Audit Log — Admin{% endblock %}
+{% block content %}
+<div class="admin-wrap">
+  <div class="admin-topbar">
+    <div class="atp-left">
+      <a href="{{ url_for('admin_dashboard') }}" class="btn btn-sm btn-outline">← Dashboard</a>
+      <h1>📜 Tamper-Evident Audit Log</h1>
+    </div>
+    <div class="atp-right">
+      <a href="{{ url_for('admin_logout') }}" class="btn btn-sm btn-danger">🚪 Logout</a>
+    </div>
+  </div>
+
+  <!-- Chain Integrity Banner -->
+  <div class="chain-banner {% if chain_status.valid %}chain-ok{% else %}chain-broken{% endif %}">
+    <div class="chain-icon">{% if chain_status.valid %}🔗{% else %}⛓️‍💥{% endif %}</div>
+    <div class="chain-info">
+      <strong>{% if chain_status.valid %}Audit Chain Intact{% else %}⚠️ CHAIN INTEGRITY BREACH{% endif %}</strong>
+      <span>{{ chain_status.message }}</span>
+      <span class="chain-sub">
+        HMAC-SHA3-256 linked chain · {{ chain_status.total }} entries verified
+        {% if not chain_status.valid %} · BROKEN AT ENTRY #{{ chain_status.broken_at }}{% endif %}
+      </span>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div class="audit-explainer">
+    <details>
+      <summary>🔐 How does the tamper-evident audit chain work?</summary>
+      <div class="explainer-body">
+        <p>Every log entry is linked to the previous one using <strong>HMAC-SHA3-256</strong>. The chain hash of each entry is computed as:</p>
+        <code>chain_hash = HMAC-SHA3-256(key=SECRET_KEY, msg=prev_hash + JSON(payload))</code>
+        <p>If any entry is modified, deleted, or reordered, the chain hash will no longer match — instantly revealing tampering. Admin usernames and IP addresses are stored as <strong>one-way SHA-256 hashes</strong> — they cannot be reversed.</p>
+      </div>
+    </details>
+  </div>
+
+  <!-- Filter -->
+  <div class="admin-toolbar">
+    <form method="GET" class="admin-search-form">
+      <select name="action" class="form-control" onchange="this.form.submit()">
+        <option value="">All Actions</option>
+        <option value="AUTH" {% if 'AUTH' in action_filter %}selected{% endif %}>🔐 Auth Events</option>
+        <option value="REPORT" {% if 'REPORT' in action_filter %}selected{% endif %}>📋 Report Actions</option>
+        <option value="FILE" {% if 'FILE' in action_filter %}selected{% endif %}>📎 File Access</option>
+        <option value="SYSTEM" {% if 'SYSTEM' in action_filter %}selected{% endif %}>⚙️ System</option>
+      </select>
+      <a href="{{ url_for('admin_audit') }}" class="btn btn-outline btn-sm">✖ Clear</a>
+    </form>
+    <span class="admin-count">{{ total }} total entries</span>
+  </div>
+
+  <!-- Audit Table -->
+  <div class="admin-table-wrap">
+    <table class="admin-table audit-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Timestamp</th>
+          <th>Action</th>
+          <th>Description</th>
+          <th>Admin Hash</th>
+          <th>IP Hash</th>
+          <th>Chain Hash</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in entries %}
+        <tr class="audit-row audit-{{ e.action.split(':')[0].lower() }}">
+          <td class="td-id">{{ e.id }}</td>
+          <td class="td-ts mono-xs">{{ e.timestamp[:19] }}</td>
+          <td>
+            <span class="audit-action-badge audit-{{ e.action.split(':')[0].lower() }}">
+              {% if 'AUTH' in e.action %}🔐
+              {% elif 'REPORT' in e.action %}📋
+              {% elif 'FILE' in e.action %}📎
+              {% elif 'SYSTEM' in e.action %}⚙️
+              {% else %}📝{% endif %}
+              {{ e.action }}
+            </span>
+          </td>
+          <td class="td-desc">{{ e.description }}</td>
+          <td><code class="mono-xs" title="SHA-256 of admin username (not reversible)">{{ e.admin_hash[:12] }}…</code></td>
+          <td><code class="mono-xs" title="SHA-256 of IP address (not reversible)">{{ e.ip_hash[:12] }}…</code></td>
+          <td><code class="mono-xs chain-hash" title="{{ e.chain_hash }}">{{ e.chain_hash[:16] }}…</code></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="td-empty">No audit log entries yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if pages > 1 %}
+  <div class="pagination">
+    {% if page > 1 %}<a href="{{ url_for('admin_audit', page=page-1, action=action_filter) }}" class="page-btn">← Prev</a>{% endif %}
+    {% for p in range([1, page-2]|max, [pages+1, page+3]|min) %}
+    <a href="{{ url_for('admin_audit', page=p, action=action_filter) }}" class="page-btn {% if p==page %}active{% endif %}">{{ p }}</a>
+    {% endfor %}
+    {% if page < pages %}<a href="{{ url_for('admin_audit', page=page+1, action=action_filter) }}" class="page-btn">Next →</a>{% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

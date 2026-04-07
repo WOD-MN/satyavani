@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Browse Reports — सत्यवाणी{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <h1 class="page-title">📂 Browse Published Reports</h1>
+    <p class="page-subtitle">{{ total }} verified, published reports — Filtered for truth</p>
+  </div>
+</div>
+<div class="container">
+  <div class="browse-layout">
+    <!-- Filters -->
+    <aside class="filter-panel">
+      <h3>🔎 Filter Reports</h3>
+      <form method="GET" action="{{ url_for('browse') }}">
+        <div class="filter-group">
+          <label>Category</label>
+          <select name="cat" class="form-control" onchange="this.form.submit()">
+            <option value="">All Categories</option>
+            {% for key, cat in categories.items() %}
+            <option value="{{ key }}" {% if sel_cat==key %}selected{% endif %}>{{ cat.icon }} {{ cat.label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Province</label>
+          <select name="prov" class="form-control" onchange="this.form.submit()">
+            <option value="">All Provinces</option>
+            {% for p in provinces %}
+            <option value="{{ p }}" {% if sel_prov==p %}selected{% endif %}>{{ p }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Urgency</label>
+          <select name="urg" class="form-control" onchange="this.form.submit()">
+            <option value="">All Urgencies</option>
+            {% for key, u in urgency_map.items() %}
+            <option value="{{ key }}" {% if sel_urg==key %}selected{% endif %}>{{ u.label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% if sel_cat or sel_prov or sel_urg %}
+        <a href="{{ url_for('browse') }}" class="btn btn-sm btn-outline" style="width:100%;text-align:center;">✖ Clear Filters</a>
+        {% endif %}
+      </form>
+    </aside>
+
+    <!-- Reports Grid -->
+    <div class="browse-reports">
+      {% if reports %}
+      <div class="reports-grid">
+        {% for r in reports %}
+        <article class="report-card urgency-{{ r.urgency }}">
+          <div class="report-card-top">
+            <span class="report-cat-badge">{{ (r.category | catinfo).icon }} {{ (r.category | catinfo).label }}</span>
+            <span class="report-urgency urgency-{{ r.urgency }}">{{ urgency_map[r.urgency].label if r.urgency in urgency_map else r.urgency }}</span>
+          </div>
+          <h3 class="report-card-title">
+            <a href="{{ url_for('view_report', token=r.token) }}">{{ r.title }}</a>
+          </h3>
+          {% if r.excerpt %}
+          <p class="report-card-excerpt">{{ r.excerpt }}…</p>
+          {% endif %}
+          <div class="report-card-meta">
+            <span>📅 {{ r.created_at | fmtdate }}</span>
+            {% if r.province %}<span>📍 {{ r.province }}{% if r.district %}, {{ r.district }}{% endif %}</span>{% endif %}
+            <span class="status-badge status-{{ r.status }}">{{ status_flow[r.status].label if r.status in status_flow else r.status }}</span>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+
+      <!-- Pagination -->
+      {% if pages > 1 %}
+      <div class="pagination">
+        {% if page > 1 %}
+        <a href="{{ url_for('browse', page=page-1, cat=sel_cat, prov=sel_prov, urg=sel_urg) }}" class="page-btn">← Prev</a>
+        {% endif %}
+        {% for p in range(1, pages+1) %}
+        <a href="{{ url_for('browse', page=p, cat=sel_cat, prov=sel_prov, urg=sel_urg) }}"
+           class="page-btn {% if p==page %}active{% endif %}">{{ p }}</a>
+        {% endfor %}
+        {% if page < pages %}
+        <a href="{{ url_for('browse', page=page+1, cat=sel_cat, prov=sel_prov, urg=sel_urg) }}" class="page-btn">Next →</a>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      {% else %}
+      <div class="empty-state">
+        <div class="es-icon">🪷</div>
+        <h3>No reports found</h3>
+        <p>No published reports match your filters yet.</p>
+        <a href="{{ url_for('browse') }}" class="btn btn-outline">View All</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

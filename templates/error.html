@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ code }} Error — सत्यवाणी{% endblock %}
+{% block content %}
+<div class="error-page">
+  <div class="container">
+    <div class="error-card">
+      <div class="error-num">{{ code }}</div>
+      <div class="error-icon">{% if code==404 %}🔍{% elif code==403 %}🚫{% else %}⚠️{% endif %}</div>
+      <h2>{% if code==404 %}Page Not Found{% elif code==403 %}Access Denied{% else %}Something Went Wrong{% endif %}</h2>
+      <p>{{ msg }}</p>
+      <a href="{{ url_for('index') }}" class="btn btn-primary">← Return Home</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

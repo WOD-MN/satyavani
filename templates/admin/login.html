@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Admin Login — सत्यवाणी</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="admin-login-body">
+  <div class="admin-login-wrap">
+    <div class="admin-login-card">
+      <div class="admin-login-logo">🔱</div>
+      <h1 class="admin-login-title">सत्यवाणी</h1>
+      <p class="admin-login-sub">Admin Access — Restricted</p>
+      {% if error %}<div class="flash-msg flash-danger">🚨 {{ error }}</div>{% endif %}
+      <form method="POST" action="{{ url_for('admin_login') }}">
+        <div class="form-group">
+          <label for="username" class="form-label">Username</label>
+          <input type="text" id="username" name="username" class="form-control" required autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" id="password" name="password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%">🔐 Login</button>
+      </form>
+      <p style="text-align:center;margin-top:1rem;opacity:.5;font-size:.85rem">
+        This area is for authorized personnel only.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

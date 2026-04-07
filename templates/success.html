@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Report Submitted — SatyaVani{% endblock %}
+{% block content %}
+<section class="page-header success-header">
+  <div class="container">
+    <div class="success-anim">
+      <div class="success-ring"></div>
+      <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+    </div>
+    <h1>Report Submitted Successfully!</h1>
+    <p class="devanagari-inline large">सत्यमेव जयते — Truth Alone Triumphs</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <div class="token-card">
+      <div class="tc-header">
+        <i class="fas fa-key"></i>
+        <h2>Your Tracking Token</h2>
+        <p>Save this token. It is the <strong>only way</strong> to track your report. We do not store your identity.</p>
+      </div>
+      <div class="token-display">
+        <code id="tokenCode">{{ token }}</code>
+        <button class="btn btn-sm btn-outline" onclick="copyToken()">
+          <i class="fas fa-copy"></i> Copy
+        </button>
+      </div>
+      <div class="token-actions">
+        <a href="{{ url_for('track') }}" class="btn btn-primary">
+          <i class="fas fa-magnifying-glass"></i> Track This Report
+        </a>
+        <a href="{{ url_for('submit') }}" class="btn btn-outline">
+          <i class="fas fa-plus"></i> Submit Another
+        </a>
+      </div>
+    </div>
+
+    <div class="next-steps">
+      <h3>What happens next?</h3>
+      <div class="steps-vertical">
+        <div class="sv-step">
+          <div class="svs-icon"><i class="fas fa-inbox"></i></div>
+          <div><strong>Review (24-48 hours)</strong><br>Our team reviews your report for completeness and credibility.</div>
+        </div>
+        <div class="sv-step">
+          <div class="svs-icon"><i class="fas fa-search"></i></div>
+          <div><strong>Investigation</strong><br>Reports are cross-referenced with existing cases and evidence.</div>
+        </div>
+        <div class="sv-step">
+          <div class="svs-icon"><i class="fas fa-gavel"></i></div>
+          <div><strong>Escalation</strong><br>Credible reports are escalated to relevant authorities (CIAA, NVC, etc.).</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="security-reminder">
+      <i class="fas fa-shield-halved"></i>
+      <strong>Security Reminder:</strong> Close this tab when done. Clear your browser history if needed.
+      Consider using private/incognito mode for all interactions with this site.
+    </div>
+  </div>
+</section>
+
+<script>
+function copyToken() {
+  navigator.clipboard.writeText('{{ token }}').then(() => {
+    const btn = event.target.closest('button');
+    btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+    setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i> Copy'; }, 2000);
+  });
+}
+</script>
+{% endblock %}

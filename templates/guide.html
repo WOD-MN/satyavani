@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Safety Guide — सत्यवाणी{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <h1 class="page-title">📘 Whistleblower Safety Guide</h1>
+    <p class="page-subtitle">How to report safely — सुरक्षित रूपमा कसरी रिपोर्ट गर्ने</p>
+  </div>
+</div>
+<div class="container">
+  <div class="guide-layout">
+    <div class="guide-toc">
+      <h3>Contents</h3>
+      <ol>
+        <li><a href="#digital">Digital Safety</a></li>
+        <li><a href="#device">Device Safety</a></li>
+        <li><a href="#evidence">Collecting Evidence</a></li>
+        <li><a href="#tor">Using Tor</a></li>
+        <li><a href="#legal">Legal Protections</a></li>
+        <li><a href="#after">After Submission</a></li>
+      </ol>
+    </div>
+    <div class="guide-content">
+      <section id="digital" class="guide-section">
+        <h2>🌐 Digital Safety</h2>
+        <ul>
+          <li><strong>Use Tor Browser</strong> — Available free at torproject.org. It hides your IP address and encrypts your traffic through multiple layers.</li>
+          <li><strong>Use a VPN</strong> — A trusted VPN adds an additional layer of protection even if you're not using Tor.</li>
+          <li><strong>Public WiFi</strong> — Submit from a coffee shop or library WiFi that has no connection to your identity.</li>
+          <li><strong>Incognito Mode</strong> — Always use private/incognito browsing when accessing this platform.</li>
+          <li><strong>Disable JavaScript</strong> — For maximum security, use the NoScript browser extension.</li>
+        </ul>
+      </section>
+      <section id="device" class="guide-section">
+        <h2>📱 Device Safety</h2>
+        <ul>
+          <li><strong>Don't use your work device</strong> — Your employer may monitor work devices.</li>
+          <li><strong>Don't use your personal phone</strong> — Use a borrowed or temporary device when possible.</li>
+          <li><strong>Disable location services</strong> — Turn off GPS and location on any device used.</li>
+          <li><strong>Clear browser history</strong> — After submitting, clear all history, cookies, and cache.</li>
+        </ul>
+      </section>
+      <section id="evidence" class="guide-section">
+        <h2>📎 Collecting Evidence Safely</h2>
+        <ul>
+          <li><strong>Photograph documents</strong> without including your reflection or identifiable background.</li>
+          <li><strong>Screen recordings</strong> — Record screens showing digital evidence.</li>
+          <li><strong>We strip metadata</strong> — But to be safe, manually remove metadata from files before uploading using tools like MAT2 or ExifTool.</li>
+          <li><strong>Don't email evidence to yourself</strong> — Email leaves a trail. Use physical USB drives.</li>
+        </ul>
+      </section>
+      <section id="tor" class="guide-section">
+        <h2>🧅 Using Tor Browser</h2>
+        <ol>
+          <li>Download Tor Browser from <strong>torproject.org</strong></li>
+          <li>Install and launch it</li>
+          <li>Navigate to this website's address</li>
+          <li>Submit your report normally</li>
+          <li>Close Tor Browser completely after</li>
+        </ol>
+        <p>Tor encrypts your connection through 3 relays worldwide. Even we cannot see your IP address when you use Tor.</p>
+      </section>
+      <section id="legal" class="guide-section">
+        <h2>⚖️ Legal Protections in Nepal</h2>
+        <ul>
+          <li>Nepal's <strong>Whistleblower Protection Act</strong> provides legal protections for those who report corruption in good faith.</li>
+          <li>The <strong>Right to Information Act</strong> protects journalists and citizens seeking government information.</li>
+          <li>The <strong>CIAA Act</strong> allows citizens to file complaints about abuse of authority.</li>
+          <li>Contact <strong>FWEAN</strong> (Forum for Women Law and Development) or <strong>INSEC</strong> for legal support.</li>
+        </ul>
+      </section>
+      <section id="after" class="guide-section">
+        <h2>🔐 After Submission</h2>
+        <ul>
+          <li><strong>Save your token</strong> — Write it on paper, never in a digital note.</li>
+          <li><strong>Don't tell anyone</strong> — Including trusted colleagues, until you know it's safe.</li>
+          <li><strong>Watch for retaliation</strong> — Document any threats or suspicious behavior after submission.</li>
+          <li><strong>Contact a journalist</strong> — Nepali journalists at major outlets (Kantipur, The Himalayan Times, Setopati) can provide additional protection through publication.</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</div>
+{% endblock %}

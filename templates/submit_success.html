@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Report Submitted — सत्यवाणी{% endblock %}
+{% block content %}
+<div class="success-page">
+  <div class="container">
+    <div class="success-card">
+      <div class="success-lotus">🪷</div>
+      <div class="success-check">✅</div>
+      <h1>Report Submitted Successfully!</h1>
+      <p class="success-np">तपाईंको प्रतिवेदन सफलतापूर्वक पठाइयो</p>
+      <p class="success-msg">
+        Your report has been received anonymously. Your identity is fully protected.
+        The dharma-team will review your submission.
+      </p>
+
+      <div class="token-box">
+        <div class="token-label">
+          🎫 Your Secret Tracking Token
+          <span class="token-label-np">गोप्य ट्र्याकिङ कोड</span>
+        </div>
+        <div class="token-value" id="tokenVal">{{ token }}</div>
+        <div class="token-actions">
+          <button onclick="copyToken()" class="btn btn-sm btn-outline">📋 Copy Token</button>
+        </div>
+        <div class="token-warning">
+          ⚠️ <strong>Save this token immediately.</strong> It is the ONLY way to track your report.
+          We cannot recover it for you. Write it on paper or store it securely offline.
+        </div>
+      </div>
+
+      <div class="success-steps">
+        <h3>What happens next?</h3>
+        <div class="next-steps">
+          <div class="ns-item">
+            <span class="ns-icon">🔍</span>
+            <div>
+              <strong>Review</strong>
+              <p>Our team reviews all submissions for credibility and completeness.</p>
+            </div>
+          </div>
+          <div class="ns-item">
+            <span class="ns-icon">✅</span>
+            <div>
+              <strong>Verification</strong>
+              <p>Evidence is cross-checked and verified where possible.</p>
+            </div>
+          </div>
+          <div class="ns-item">
+            <span class="ns-icon">📢</span>
+            <div>
+              <strong>Publication</strong>
+              <p>Verified reports may be published or forwarded to appropriate agencies.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="success-actions">
+        <a href="{{ url_for('track') }}" class="btn btn-primary">🔍 Track Your Report</a>
+        <a href="{{ url_for('submit') }}" class="btn btn-outline">📝 Submit Another</a>
+        <a href="{{ url_for('index') }}" class="btn btn-ghost">🏠 Home</a>
+      </div>
+
+      <div class="success-quote">
+        <p>"सत्यमेव जयते — Truth Alone Triumphs"</p>
+        <p class="sq-sub">Your act of courage today plants a seed of justice for tomorrow.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function copyToken() {
+  const t = document.getElementById('tokenVal').textContent;
+  navigator.clipboard.writeText(t).then(() => alert('Token copied to clipboard! Store it safely.'));
+}
+// Clear token from session memory after 5 mins
+setTimeout(() => { document.getElementById('tokenVal').textContent = '[Token cleared for security]'; }, 300000);
+</script>
+{% endblock %}

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>2FA Verification — सत्यवाणी</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="admin-login-body">
+  <div class="admin-login-wrap">
+    <div class="admin-login-card">
+      <div class="admin-login-logo">🔐</div>
+      <h1 class="admin-login-title">Two-Factor Auth</h1>
+      <p class="admin-login-sub">द्वि-कारक प्रमाणीकरण</p>
+      <p style="color:var(--clr-text-muted);font-size:.9rem;margin-bottom:1.5rem">
+        Enter the 6-digit code from your authenticator app for <strong>{{ username }}</strong>
+      </p>
+      {% if error %}<div class="flash-msg flash-danger" style="margin-bottom:1rem">🚨 {{ error }}</div>{% endif %}
+      <form method="POST" action="{{ url_for('admin_2fa') }}">
+        <div class="form-group">
+          <label for="code" class="form-label">TOTP Code</label>
+          <input type="text" id="code" name="code" class="form-control"
+                 placeholder="000000" maxlength="6" pattern="[0-9]{6}"
+                 autocomplete="one-time-code" autofocus
+                 style="font-family:var(--font-mono);font-size:1.5rem;letter-spacing:.4em;text-align:center">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%">✅ Verify</button>
+      </form>
+      <p style="margin-top:1rem;font-size:.78rem;opacity:.4;text-align:center">
+        Code valid for 30 seconds · RFC 6238 TOTP
+      </p>
+      <div style="margin-top:1.5rem;text-align:center">
+        <a href="{{ url_for('admin_logout') }}" style="font-size:.82rem;color:var(--clr-text-faint)">
+          ← Back to login
+        </a>
+      </div>
+    </div>
+  </div>
+  <script>
+  // Auto-submit when 6 digits entered
+  document.getElementById('code').addEventListener('input', function() {
+    if (this.value.length === 6 && /^\d{6}$/.test(this.value)) {
+      this.form.submit();
+    }
+  });
+  </script>
+</body>
+</html>

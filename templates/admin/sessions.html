@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Active Sessions — Admin{% endblock %}
+{% block content %}
+<div class="admin-wrap">
+  <div class="admin-topbar">
+    <div class="atp-left">
+      <a href="{{ url_for('admin_dashboard') }}" class="btn btn-sm btn-outline">← Dashboard</a>
+      <h1>🖥️ Active Admin Sessions</h1>
+    </div>
+  </div>
+  <div class="admin-table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr><th>#</th><th>Admin</th><th>IP Hash</th><th>Created</th><th>Last Active</th><th>Expires</th><th>2FA</th><th>Valid</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        {% for s in sessions %}
+        <tr class="{% if not s.is_valid %}tr-invalid{% endif %}">
+          <td>{{ s.id }}</td>
+          <td><strong>{{ s.username }}</strong></td>
+          <td><code class="mono-xs" title="SHA-256 hashed IP">{{ s.ip_hash[:16] }}…</code></td>
+          <td class="td-date">{{ s.created_at | fmtdate }}</td>
+          <td class="td-date">{{ s.last_active | fmtdate }}</td>
+          <td class="td-date">{{ s.expires_at | fmtdate }}</td>
+          <td>{% if s.totp_verified %}✅{% else %}❌{% endif %}</td>
+          <td>{% if s.is_valid %}<span class="badge-mini badge-green">Active</span>{% else %}<span class="badge-mini badge-red">Revoked</span>{% endif %}</td>
+          <td>
+            {% if s.is_valid %}
+            <form method="POST" action="{{ url_for('admin_revoke_session', sid=s.id) }}"
+                  onsubmit="return confirm('Revoke this session?')">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-sm btn-danger">Revoke</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p style="color:var(--clr-text-faint);font-size:.82rem;margin-top:1rem;padding:0 var(--sp-md)">
+    ℹ️ IP addresses stored as SHA-256 hashes — not reversible. Session tokens are server-side only.
+  </p>
+</div>
+{% endblock %}

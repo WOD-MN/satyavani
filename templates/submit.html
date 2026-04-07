@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+{% block title %}Submit Report — सत्यवाणी{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="container">
+    <h1 class="page-title">🔏 Submit Anonymous Report</h1>
+    <p class="page-subtitle">गुप्त प्रतिवेदन — Your identity is completely protected. No IP is recorded.</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="submit-layout">
+
+    <!-- ── Anonymity Panel ─────────────────────────────────────── -->
+    <aside class="submit-sidebar">
+      <div class="sidebar-widget anon-widget">
+        <div class="widget-icon">🛡️</div>
+        <h3>Anonymity Guarantee</h3>
+        <ul class="anon-list">
+          <li>✅ No IP address recorded</li>
+          <li>✅ No cookies or tracking</li>
+          <li>✅ No registration required</li>
+          <li>✅ File metadata stripped</li>
+          <li>✅ Tor Browser supported</li>
+          <li>✅ Encrypted at rest</li>
+        </ul>
+      </div>
+      <div class="sidebar-widget">
+        <div class="widget-icon">📎</div>
+        <h3>Accepted File Types</h3>
+        <div class="file-types">
+          <div class="ft-group"><strong>📄 Documents</strong><span>PDF, DOCX, TXT, XLSX, ODS, RTF</span></div>
+          <div class="ft-group"><strong>🖼️ Images</strong><span>JPG, PNG, GIF, WEBP, TIFF, HEIC</span></div>
+          <div class="ft-group"><strong>🎬 Video</strong><span>MP4, AVI, MOV, MKV, WEBM</span></div>
+          <div class="ft-group"><strong>🎙️ Audio</strong><span>MP3, WAV, OGG, AAC, FLAC, M4A</span></div>
+          <div class="ft-group"><strong>📦 Archives</strong><span>ZIP, RAR, 7Z, TAR, GZ</span></div>
+          <div class="ft-group"><strong>🗃️ Other</strong><span>JSON, XML, EML, MSG</span></div>
+        </div>
+        <p class="ft-note">Max total size: 500MB. Multiple files allowed.</p>
+      </div>
+      <div class="sidebar-widget tip-widget">
+        <div class="widget-icon">💡</div>
+        <h3>Before You Submit</h3>
+        <ol class="tip-list">
+          <li>Use Tor Browser or a VPN</li>
+          <li>Be specific — include dates, names, amounts</li>
+          <li>Attach supporting evidence</li>
+          <li>Save your tracking token safely</li>
+          <li>Don't submit from your work device</li>
+        </ol>
+      </div>
+    </aside>
+
+    <!-- ── Main Form ──────────────────────────────────────────────── -->
+    <div class="submit-form-wrap">
+      <form method="POST" action="{{ url_for('submit') }}"
+            enctype="multipart/form-data" id="submitForm" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <!-- Title -->
+        <div class="form-group">
+          <label for="title" class="form-label">
+            Report Title <span class="req">*</span>
+            <span class="label-np">शीर्षक</span>
+          </label>
+          <input type="text" id="title" name="title" class="form-control"
+                 placeholder="Brief, descriptive title of the corruption incident"
+                 maxlength="200" required autocomplete="off">
+          <span class="char-count" data-max="200">0/200</span>
+        </div>
+
+        <!-- Category + Subcategory -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="category" class="form-label">
+              Category <span class="req">*</span>
+              <span class="label-np">श्रेणी</span>
+            </label>
+            <select id="category" name="category" class="form-control" required>
+              <option value="">— Select Category —</option>
+              {% for key, cat in categories.items() %}
+              <option value="{{ key }}">{{ cat.icon }} {{ cat.label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="subcategory" class="form-label">
+              Sub-category / Department
+              <span class="label-np">उप-श्रेणी</span>
+            </label>
+            <input type="text" id="subcategory" name="subcategory" class="form-control"
+                   placeholder="e.g. Land Revenue Office, Kathmandu" maxlength="100" autocomplete="off">
+          </div>
+        </div>
+
+        <!-- Province + District -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="province" class="form-label">
+              Province <span class="label-np">प्रदेश</span>
+            </label>
+            <select id="province" name="province" class="form-control">
+              <option value="">— Select Province —</option>
+              {% for prov in provinces %}
+              <option value="{{ prov }}">{{ prov }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="district" class="form-label">
+              District <span class="label-np">जिल्ला</span>
+            </label>
+            <input type="text" id="district" name="district" class="form-control"
+                   placeholder="e.g. Kathmandu, Pokhara..." maxlength="100" autocomplete="off">
+          </div>
+        </div>
+
+        <!-- Urgency + Language -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="urgency" class="form-label">
+              Urgency Level <span class="label-np">आत्यावश्यकता</span>
+            </label>
+            <select id="urgency" name="urgency" class="form-control">
+              {% for key, urg in urgency_map.items() %}
+              <option value="{{ key }}" {% if key=='medium' %}selected{% endif %}>{{ urg.label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="language" class="form-label">
+              Report Language <span class="label-np">भाषा</span>
+            </label>
+            <select id="language" name="language" class="form-control">
+              <option value="en">English</option>
+              <option value="ne">नेपाली (Nepali)</option>
+              <option value="both">Both / दुवै</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label for="description" class="form-label">
+            Full Description <span class="req">*</span>
+            <span class="label-np">विस्तृत विवरण</span>
+          </label>
+          <textarea id="description" name="description" class="form-control desc-area"
+                    rows="12" maxlength="50000" required
+                    placeholder="Describe the corruption incident in detail. Include:
+• Who is involved (names, positions, offices)
+• What happened (specific corrupt acts)
+• When it occurred (dates, timeline)
+• Where it happened (location, office, addresses)
+• How it was done (methods, amounts, procedures bypassed)
+• Evidence you have or have attached"></textarea>
+          <span class="char-count" data-max="50000">0/50000</span>
+        </div>
+
+        <!-- File Uploads -->
+        <div class="form-group">
+          <label class="form-label">
+            Evidence Attachments
+            <span class="label-np">प्रमाण संलग्न</span>
+          </label>
+          <div class="dropzone" id="dropzone" role="button" tabindex="0"
+               aria-label="Drop files here or click to upload">
+            <div class="dz-inner">
+              <div class="dz-icon">📂</div>
+              <p class="dz-main">Drag & drop files here</p>
+              <p class="dz-sub">or <strong>click to browse</strong></p>
+              <p class="dz-types">Documents · Images · Videos · Audio · Archives</p>
+            </div>
+            <input type="file" id="attachments" name="attachments"
+                   multiple accept="*/*" class="dz-input">
+          </div>
+          <div id="fileList" class="file-list" aria-live="polite"></div>
+        </div>
+
+        <!-- Submit -->
+        <div class="form-submit-area">
+          <div class="submit-warning">
+            <strong>⚠️ Important:</strong> Once submitted, reports cannot be edited.
+            Make sure all information is accurate. False reports harm the platform.
+          </div>
+          <button type="submit" class="btn btn-primary btn-xl" id="submitBtn">
+            <span class="btn-lotus">🪷</span>
+            Submit Report Anonymously
+            <span class="btn-sub">No account required</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Character counters
+document.querySelectorAll('[data-max]').forEach(el => {
+  const input = el.previousElementSibling;
+  if (!input) return;
+  const update = () => {
+    const len = input.value.length;
+    const max = parseInt(el.dataset.max);
+    el.textContent = `${len}/${max}`;
+    el.style.color = len > max * 0.9 ? '#e74c3c' : '';
+  };
+  input.addEventListener('input', update);
+});
+
+// Dropzone
+const dz = document.getElementById('dropzone');
+const input = document.getElementById('attachments');
+const fileList = document.getElementById('fileList');
+
+dz.addEventListener('click', () => input.click());
+dz.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') input.click(); });
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dz-active'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('dz-active'));
+dz.addEventListener('drop', e => {
+  e.preventDefault();
+  dz.classList.remove('dz-active');
+  const dt = new DataTransfer();
+  for (const f of e.dataTransfer.files) dt.items.add(f);
+  input.files = dt.files;
+  renderFiles(input.files);
+});
+input.addEventListener('change', () => renderFiles(input.files));
+
+function renderFiles(files) {
+  fileList.innerHTML = '';
+  for (const f of files) {
+    const sz = f.size > 1048576 ? `${(f.size/1048576).toFixed(1)} MB` : `${(f.size/1024).toFixed(0)} KB`;
+    const div = document.createElement('div');
+    div.className = 'file-item';
+    div.innerHTML = `<span class="fi-icon">${getIcon(f.name)}</span>
+                     <span class="fi-name">${f.name}</span>
+                     <span class="fi-size">${sz}</span>`;
+    fileList.appendChild(div);
+  }
+}
+
+function getIcon(name) {
+  const ext = name.split('.').pop().toLowerCase();
+  const map = {pdf:'📄',doc:'📝',docx:'📝',txt:'📄',xlsx:'📊',jpg:'🖼️',
+                jpeg:'🖼️',png:'🖼️',gif:'🖼️',mp4:'🎬',avi:'🎬',mov:'🎬',
+                mp3:'🎵',wav:'🎵',ogg:'🎵',zip:'📦',rar:'📦'};
+  return map[ext] || '📎';
+}
+
+// Prevent accidental navigation
+let submitted = false;
+document.getElementById('submitForm').addEventListener('submit', () => { submitted = true; });
+window.addEventListener('beforeunload', e => {
+  if (!submitted && document.getElementById('description').value.length > 10) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+</script>
+{% endblock %}
